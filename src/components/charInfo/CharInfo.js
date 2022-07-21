@@ -1,4 +1,6 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types'
+
 import Spinner from '../spiner/Spinr';
 import ErrorMassage from '../errorMassage/ErrorMassage';
 import MarvelService from '../../services/MarvelService';
@@ -121,5 +123,9 @@ const VieW = ({ char }) => {
     </>
   );
 };
+
+CharInfo.propTypes = {
+  charID: PropTypes.number
+}
 
 export default CharInfo;

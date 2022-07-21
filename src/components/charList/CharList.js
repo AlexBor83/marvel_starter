@@ -1,4 +1,6 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
+
 import Spinner from '../spiner/Spinr';
 import MarvelService from '../../services/MarvelService';
 import ErrorMassage from '../errorMassage/ErrorMassage';
@@ -12,7 +14,7 @@ class CharList extends Component {
     error: false,
     newItemLoading: false,
     offset: 210,
-    charEnded: false
+    charEnded: false,
   };
 
   marvelService = new MarvelService();
@@ -37,9 +39,9 @@ class CharList extends Component {
   };
 
   onListLoaded = (newCharList) => {
-    let ended = false
+    let ended = false;
 
-    if(newCharList.length <= 8) {
+    if (newCharList.length <= 8) {
       ended = true;
     }
 
@@ -56,8 +58,22 @@ class CharList extends Component {
     this.setState({ loading: false, error: true });
   };
 
+  itemsRefs = [];
+
+  setRef = (ref) => {
+    this.itemsRefs.push(ref);
+  };
+
+  focusOnItem = (id) => {
+    this.itemsRefs.forEach((item) =>
+      item.classList.remove('char__item_selected')
+    );
+    this.itemsRefs[id].classList.add('char__item_selected');
+    this.itemsRefs[id].focus();
+  };
+
   renderItems(arr) {
-    const items = arr.map((item) => {
+    const items = arr.map((item, i) => {
       let imgStyle = { objectFit: 'cover' };
       if (
         item.thumbnail ===
@@ -69,8 +85,14 @@ class CharList extends Component {
       return (
         <li
           className='char__item'
+          tabIndex={0}
+          ref={this.setRef}
           key={item.id}
-          onClick={() => this.props.onCharSelectend(item.id)}
+          onClick={() => {
+            this.props.onCharSelectend(item.id);
+            this.focusOnItem(i)
+          }}
+          
         >
           <img src={item.thumbnail} alt={item.name} style={imgStyle} />
           <div className='char__name'>{item.name}</div>
@@ -82,7 +104,8 @@ class CharList extends Component {
   }
 
   render() {
-    const { charList, loading, error, newItemLoading, offset, charEnded } = this.state;
+    const { charList, loading, error, newItemLoading, offset, charEnded } =
+      this.state;
 
     const items = this.renderItems(charList);
 
@@ -95,16 +118,21 @@ class CharList extends Component {
         {errorMessage}
         {spinner}
         {content}
-        <button 
+        <button
           className='button button__main button__long'
           disabled={newItemLoading}
-          style = {{'display': charEnded ? 'none' : 'block'}}
-          onClick={() => this.onRequest(offset)}>
+          style={{ display: charEnded ? 'none' : 'block' }}
+          onClick={() => this.onRequest(offset)}
+        >
           <div className='inner'>load more</div>
         </button>
       </div>
     );
   }
 }
+
+CharList.propTypes = {
+  onCharSelectend: PropTypes.func.isRequired,
+};
 
 export default CharList;
